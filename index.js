@@ -73,7 +73,7 @@ Validaciones - Libros
 
 */
 const autorRoute = require("./routes/autor.route")
-
+const librosRoute =require("./routes/libros.route")
 const express = require("express")
 
 const server = express()
@@ -87,6 +87,7 @@ server.get("/ping",(req, res)=>{
 })
 
 autorRoute(server)
+librosRoute(server)
 
 server.use((err,req,res,next)=>{
 
