@@ -38,8 +38,8 @@ Validaciones - Autores
     GET /autores
         Devuelve la lista de autores si hay alguno o un array vacío. OK
     POST /autores
-        Si ya existe un autor con el mismo nombre y apellido, devuelve un 409
-        De lo contrario agrega el nuevo autor y devuelve 201 con el JSON correspondiente al autor
+        Si ya existe un autor con el mismo nombre y apellido, devuelve un 409. OK
+        De lo contrario agrega el nuevo autor y devuelve 201 con el JSON correspondiente al autor. OK
     GET /autores/:id
         Si el autor no existe devuelve un 404
         De lo contrario devuelve 200 con el autor correspondiente

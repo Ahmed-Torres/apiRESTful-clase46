@@ -4,6 +4,28 @@ module.exports.getAutores = function() {
     return dataStore.autores;
 }
 
+module.exports.getAutorById = function(autorById){
+    let buscarAutorPorId = dataStore.autores.find(a=>a.id == autorById)
+    if(buscarAutorPorId){
+        return buscarAutorPorId   
+    }else{
+        throw new Error("No existe el autor que queres buscar :(")
+    }
+
+}
+
+
+// -------falta resolver este delete-----
+module.exports.deleteAutorById = function(autorAborrar){
+    let buscarAutorById = dataStore.autores.find(a=>a.id == autorAborrar)
+    if(buscarAutorById){
+        let resultado = dataStore.autores.splice(0, buscarAutorById-1)
+        return resultado
+    }else{
+        throw new Error("No encuentro a la víctima :/")
+    }
+}
+
 /* 
 
 {

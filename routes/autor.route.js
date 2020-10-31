@@ -29,4 +29,30 @@ module.exports = function (server) {
             res.status(409).json({error: err.message})  
         }
     })
+
+    server.get("/autores/:id", (req,res)=>{
+        let Idparam = req.params.id
+
+        try {
+            let autorById = autorService.getAutorById(Idparam);
+            res.status(200).json(autorById)
+        } catch (error) {
+            res.status(404).json({error: error.message})
+        }
+    })
+    // -------falta resolver este delete-----
+    server.delete("/autores/:id", (req,res)=>{
+        let borrameId = req.params.id
+        try {
+            let autorAborrar = autorService.deleteAutorById(borrameId)
+            res.status(204).json("Autor eliminado con éxito:" +autorAborrar)
+        } catch (error) {
+            res.status(404).json({error:error.message})
+        }
+
+    })
+
+    server.put("/autores/:id",(req,res)=>{
+
+    })
 }
