@@ -75,9 +75,9 @@ Validaciones - Libros
 const autorRoute = require("./routes/autor.route")
 const librosRoute =require("./routes/libros.route")
 const express = require("express")
-
+const jwt = require("jsonwebtoken")
+const firma = "SECRETO"
 const server = express()
-
 server.use(express.json())
 
 server.get("/ping",(req, res)=>{
@@ -99,6 +99,99 @@ server.use((err,req,res,next)=>{
     }
     next()
 })
+//-------autenticacion y autorizacion con jwt----------------//
+
+var usuarios = [
+    {
+        id: 1,
+        userName: "yamilt",
+        nombre: "Yamil",
+        password: "1234",
+        roles: [
+            "ADMIN",
+            "NORMAL_USER"
+        ]
+    },
+    {
+        id: 2,
+        userName: "normal",
+        nombre: "normal",
+        password: "123asd",
+        roles: [
+            "NORMAL_USER"
+        ]
+    }
+]
+
+server.post("/login", (req,res)=>{
+    let user = req.body
+    let findUser = usuarios.find(r => r.id == user.id)
+
+    if(!findUser){
+        res.status(400).json({
+            message: "invalid user or password"
+        })
+    }
+
+//claims el pedazito de codigo siguiente, asi lo vamos a conocer o ver 
+    let payLoad = {
+        id: findUser.id,
+        nombre: findUser.nombre
+    }
+    
+
+    let token = jwt.sign(payLoad, firma)
+
+    res.status(200).send(token) 
+})
+
+
+let autorizar = (rolesRequeridos) => (req,res,next) => {
+    let token = req.headers["authorization"].split(" ")[1]
+    console.log(token)
+    let user = null
+    
+    try {
+        user = jwt.verify(token, firma)    
+    } catch (error) {
+        res.status(401).send("eh, que hace?")
+        return;
+    }
+    
+    let findUser = usuarios.find(r => r.id == user.id)
+    let tieneRol = false
+
+    if(rolesRequeridos && rolesRequeridos.length != 0){
+        for (let i = 0; i < rolesRequeridos.length; i++) {
+            const rol = rolesRequeridos[i];
+            if(findUser.roles.includes(rol)){
+                tieneRol = true
+            }
+        }
+        if(!tieneRol){
+            res.status(401).send("eh, que hace?")
+            return;
+        }
+    }
+    console.log(user)
+
+    next()
+}
+
+server.get("/abierto",(req,res)=>{
+    res.send("Todo ok")
+})
+
+server.get("/normal_user", autorizar(),(req,res)=>{
+    res.send("Hola, solo podes leer esto si estás logeado")
+})
+
+server.get("/cerrado", autorizar(["ADMIN"]),(req,res)=>{
+    res.send("Hola, solo podes leer esto si estás logeado")
+})
+
+
+
 //-------------------------------------//
 server.listen(3000, ()=>{
     console.log("server on")

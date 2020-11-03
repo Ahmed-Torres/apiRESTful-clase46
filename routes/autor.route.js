@@ -45,7 +45,7 @@ module.exports = function (server) {
         let borrameId = req.params.id
         try {
             let autorAborrar = autorService.deleteAutorById(borrameId)
-            res.status(204).json("Autor eliminado con éxito:" +autorAborrar)
+            res.status(204).json("Autor eliminado con éxito:" + autorAborrar)
         } catch (error) {
             res.status(404).json({error:error.message})
         }

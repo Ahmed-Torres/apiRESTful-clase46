@@ -16,10 +16,12 @@ module.exports.getAutorById = function(autorById){
 
 
 // -------falta resolver este delete-----
-module.exports.deleteAutorById = function(autorAborrar){
-    let buscarAutorById = dataStore.autores.find(a=>a.id == autorAborrar)
-    if(buscarAutorById){
-        let resultado = dataStore.autores.splice(0, buscarAutorById-1)
+module.exports.deleteAutorById = function(borrameId){
+    let buscarAutorById = dataStore.autores.find(a=>a.id == borrameId)
+    console.log(buscarAutorById)
+    let borrarAutor = buscarAutorById.id
+    if(borrarAutor){
+        let resultado = dataStore.autores.borrarAutor(borrarAutor)
         return resultado
     }else{
         throw new Error("No encuentro a la víctima :/")

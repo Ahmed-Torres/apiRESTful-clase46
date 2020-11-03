@@ -41,7 +41,11 @@ const dataStore = require("../db/datastore")
     })
 
     server.get("/autores/:id/libros/:idLibro", (req,res)=>{
+        let idAutor = req.params.id
+        let idLibro = req.params.idLibro
 
+        console.log(idAutor)
+        console.log(idLibro)
     })
 
     server.post("/autores/:id/libros/:idLibro", (req,res)=>{

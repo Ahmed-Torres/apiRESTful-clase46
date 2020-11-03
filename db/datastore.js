@@ -22,5 +22,9 @@ module.exports = {
         autor.libros.push(libro)
         idLibro++
         return libro
+    },
+    borrarAutor(borrarAutor){
+        autores.splice(0,borrarAutor)
+        return borrarAutor
     }
 }
