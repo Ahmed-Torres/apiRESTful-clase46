@@ -76,8 +76,13 @@ const autorRoute = require("./routes/autor.route")
 const librosRoute =require("./routes/libros.route")
 const express = require("express")
 const jwt = require("jsonwebtoken")
-const firma = "SECRETO"
+const SECRETO_JWT = "SECRETO"
 const server = express()
+const usuarioRepo = require("./repository/user.repository")
+
+
+
+
 server.use(express.json())
 
 server.get("/ping",(req, res)=>{
@@ -100,6 +105,8 @@ server.use((err,req,res,next)=>{
     next()
 })
 //-------autenticacion y autorizacion con jwt----------------//
+/*
+
 
 var usuarios = [
     {
@@ -123,9 +130,11 @@ var usuarios = [
     }
 ]
 
-server.post("/login", (req,res)=>{
+
+*/
+server.post("/login", async (req,res)=>{
     let user = req.body
-    let findUser = usuarios.find(r => r.id == user.id)
+    let findUser = await usuarioRepo.autenticarUser(user.userName, user.password)
 
     if(!findUser){
         res.status(400).json({
@@ -133,32 +142,30 @@ server.post("/login", (req,res)=>{
         })
     }
 
-//claims el pedazito de codigo siguiente, asi lo vamos a conocer o ver 
+    //claims el pedazito de codigo siguiente, asi lo vamos a conocer o ver 
     let payLoad = {
         id: findUser.id,
         nombre: findUser.nombre
     }
-    
-
-    let token = jwt.sign(payLoad, firma)
-
+    let token = jwt.sign(payLoad, SECRETO_JWT)
+    ////
     res.status(200).send(token) 
 })
 
 
-let autorizar = (rolesRequeridos) => (req,res,next) => {
+let autorizar = (rolesRequeridos) => async (req,res,next) => {
     let token = req.headers["authorization"].split(" ")[1]
     console.log(token)
     let user = null
     
     try {
-        user = jwt.verify(token, firma)    
+        user = jwt.verify(token, SECRETO_JWT)    
     } catch (error) {
         res.status(401).send("eh, que hace?")
         return;
     }
     
-    let findUser = usuarios.find(r => r.id == user.id)
+    let findUser = await usuarioRepo.getUser(user.id)
     let tieneRol = false
 
     if(rolesRequeridos && rolesRequeridos.length != 0){
@@ -191,8 +198,20 @@ server.get("/cerrado", autorizar(["ADMIN"]),(req,res)=>{
 })
 
 
+server.post("/registrar", (req,res)=>{
+    let body = req.body
 
-//-------------------------------------//
-server.listen(3000, ()=>{
-    console.log("server on")
+    try{
+        usuarioRepo.registrarUser(body)
+        res.send("ok")
+    }catch(error){
+        res.status(400).send(error.message)
+    }
 })
+//-------------------------------------//
+async function initServer(){
+    server.listen(3000, ()=>{
+        console.log("server on")
+    })
+}
+initServer()
