@@ -79,9 +79,11 @@ const jwt = require("jsonwebtoken")
 const SECRETO_JWT = "SECRETO"
 const server = express()
 const usuarioRepo = require("./repository/user.repository")
+const mongoose = require('mongoose')
 
+//asi le decimos que estos son los archivos estaticos
 
-
+server.use(express.static("public"))
 
 server.use(express.json())
 
@@ -105,33 +107,7 @@ server.use((err,req,res,next)=>{
     next()
 })
 //-------autenticacion y autorizacion con jwt----------------//
-/*
 
-
-var usuarios = [
-    {
-        id: 1,
-        userName: "yamilt",
-        nombre: "Yamil",
-        password: "1234",
-        roles: [
-            "ADMIN",
-            "NORMAL_USER"
-        ]
-    },
-    {
-        id: 2,
-        userName: "normal",
-        nombre: "normal",
-        password: "123asd",
-        roles: [
-            "NORMAL_USER"
-        ]
-    }
-]
-
-
-*/
 server.post("/login", async (req,res)=>{
     let user = req.body
     let findUser = await usuarioRepo.autenticarUser(user.userName, user.password)
@@ -193,25 +169,64 @@ server.get("/normal_user", autorizar(),(req,res)=>{
     res.send("Hola, solo podes leer esto si estás logeado")
 })
 
-server.get("/cerrado", autorizar(["ADMIN"]),(req,res)=>{
+server.get("/cerrado", async (req,res)=>{
     res.send("Hola, solo podes leer esto si estás logeado")
 })
 
+server.get("/users", async (req,res)=>{
+    let usuarios = await usuarioRepo.getUsers()
+    res.send(usuarios)
+})
 
-server.post("/registrar", (req,res)=>{
+server.get("/users/:id", async (req,res)=>{
+    let usuarios = await usuarioRepo.getUser(req.params.id)
+    res.send(usuarios)
+})
+
+
+server.post("/registrar", async (req,res)=>{
     let body = req.body
 
     try{
-        usuarioRepo.registrarUser(body)
+        await usuarioRepo.registrarUser(body)
         res.send("ok")
     }catch(error){
         res.status(400).send(error.message)
     }
 })
+
+server.put("/actualizar/:id", async (req,res)=>{
+    let body = req.body
+
+    try{
+        await usuarioRepo.actualizarUsuario(body, req.params.id)
+        res.send("ok")
+    }catch(error){
+        res.status(400).send(error.message)
+    }
+})
+
+server.delete("/users/:id", async (req,res)=>{  
+    try{
+        await usuarioRepo.eliminar(req.params.id)
+        res.send("ok")
+    }catch(error){
+        res.status(400).send(error.message)
+    }
+})
+
+
 //-------------------------------------//
 async function initServer(){
-    server.listen(3000, ()=>{
-        console.log("server on")
+
+    mongoose.connect("mongodb://localhost:27017/dwfs").then(r => {
+        server.listen(3000, ()=>{
+            console.log("server on")
+        })
+    }).catch(error => {
+        console.log("No pude conectar a la base de datos")
     })
+
+
 }
 initServer()

@@ -1,1 +1,0 @@
-[{"id":1,"userName":"yamilt","nombre":"Yamil","password":"123ASD","roles":["ADMIN","NORMAL_USER"]},{"id":2,"userName":"normal","nombre":"normal","password":"123ASD","roles":["NORMAL_USER"]},{"id":3,"userName":"yamilt","nombre":"Yamil","password":"123ASD","roles":["NORMAL_USER"]}]
